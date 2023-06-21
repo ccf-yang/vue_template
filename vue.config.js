@@ -24,7 +24,7 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
+  publicPath: '',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -44,6 +44,18 @@ module.exports = {
         },
         logLevel:'debug' //打印代理后的地址
       },
+      // '/bmcapi': {
+      //   target: 'https://test-cg.ppio.cloud', // 代理的目标地址为 HTTPS 协议,如果ingress禁止了cors设置，就需要用nginx反向代理去请求下，做到域名替换，这里配置无用。
+      //   changeOrigin: true,
+      //   // secure: true ,
+      //   // ws: true, 
+      //   // pathRewrite: {
+      //   //   '^/bmcapi': '' 
+      //   // },
+      //   logLevel:'debug',
+      // },
+ 
+      
       '/resolv': {
         target: 'https://118.89.204.198/resolv', // https跨域代理示例
         changeOrigin: true,
@@ -54,17 +66,6 @@ module.exports = {
         },
         logLevel:'debug'
       },
-      '/bmcapi': {
-        target: 'https://test-cg.ppio.cloud/bmcapi', // 代理的目标地址为 HTTPS 协议
-        changeOrigin: true,
-        secure: true ,
-        ws: true, 
-        pathRewrite: {
-          '^/bmcapi': '' 
-        },
-        logLevel:'debug'
-      },
-     
 
       //多种跨域eg:  接口地址有重叠地址时，将匹配度低的放在后面
       // proxy: {
