@@ -47,12 +47,6 @@ module.exports = {
       // '/bmcapi': {
       //   target: 'https://test-cg.ppio.cloud', // 代理的目标地址为 HTTPS 协议,如果ingress禁止了cors设置，就需要用nginx反向代理去请求下，做到域名替换，这里配置无用。
       //   changeOrigin: true,
-      //   // secure: true ,
-      //   // ws: true, 
-      //   // pathRewrite: {
-      //   //   '^/bmcapi': '' 
-      //   // },
-      //   logLevel:'debug',
       // },
  
       
