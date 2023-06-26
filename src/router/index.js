@@ -74,6 +74,12 @@ export const constantRoutes = [
         meta: { title: 'bmcinfo_all', icon: 'form' }
       },
       {
+        path: 'peie_config',
+        name: 'peie_config',
+        component: () => import('@/views/bmc_info/peie/index'),
+        meta: { title: '配置配额', icon: 'form' }
+      },
+      {
         path: 'index_single',
         name: 'bmcinfo_single',
         component: () => import('@/views/bmc_info/single/index'),
