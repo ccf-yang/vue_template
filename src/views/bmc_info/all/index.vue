@@ -1,196 +1,120 @@
 <template>
   <div class="app-container">
-    <el-form ref="bmc" :model="form" label-width="120px">
+    <!-- :model的作用是，当用户在input框或者input框数据有变化时，自动将值赋值给变量，变量值自动更新,表单默认是字典类型 -->
+    <el-form  :model="bmc" label-width="120px">
       <el-row>
-        <el-col :span="3">
-          <el-form-item label="区域">
-            <el-input v-model="bmc.location" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="3">
-          <el-form-item label="armserverId">
-            <el-input v-model="bmc.serverid" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="3">
-          <el-form-item label="owner">
-            <el-input v-model="bmc.owner" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="3">
-          <el-form-item label="电源状态">
-            <el-input v-model="bmc.powerstatus" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="3">
-          <el-form-item label="页数">
-            <el-input v-model="bmc.pagenum" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="3">
-          <el-form-item label="页大小">
-            <el-input v-model="bmc.pagesize" />
+        <el-col v-for="item in formItems" :key="item.prop" span="3">
+          <!-- key的取值是通过item.prop变量，span取值是取赋值的变量3 -->
+          <el-form-item :label="item.label">
+            <el-input v-model="bmc[item.prop]" /> 
+            <!-- v-model 就是 vue 的双向绑定的指令，能将页面上控件输入的值同步更新到相关绑定的data属性，也会在更新data绑定属性时候，更新页面上输入控件的值，双向自更新与赋值，可以通过v-model取值 -->
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="24">
+        <el-col span="3">
           <el-form-item label="是否显示结果">
-            <!-- 通过开关控件来控制，是否展示结果json -->
             <el-switch v-model="showResult" active-color="#13ce66" inactive-color="#D3D3D3" @change="getbmc"></el-switch>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row v-if="showResult">
-        <el-col :span="500">
+        <el-col span="500">
           <el-form-item label="结果">
             <el-input type="textarea" v-model="bmc.textarea"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="24">
+        <el-col span="24">
           <el-form-item>
             <el-button type="primary" @click="getbmc">查询</el-button>
             <el-button @click="onCancel">取消</el-button>
-            <el-button @click="getbmc2">test</el-button>
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
 
     <el-table :data="tableData">
-      <el-table-column prop="id" label="ID"></el-table-column>
-      <el-table-column prop="mac" label="mac地址"></el-table-column>
-      <el-table-column prop="position" label="位置"></el-table-column>
-      <el-table-column prop="location" label="区域"></el-table-column>
-      <el-table-column prop="powerStatus" label="电源状况"></el-table-column>
-      <el-table-column prop="sysStatus" label="系统状况"></el-table-column>
-      <el-table-column prop="ip" label="IP"></el-table-column>
-      <el-table-column prop="netmask" label="子网掩码"></el-table-column>
-      <el-table-column prop="gateway" label="网关"></el-table-column>
-      <el-table-column prop="vlan" label="VLAN"></el-table-column>
-      <el-table-column prop="CPU" label="CPU型号"></el-table-column>
-      <el-table-column prop="memory" label="内存"></el-table-column>
-      <el-table-column prop="storage" label="存储"></el-table-column>
-      <el-table-column prop="CPUCores" label="CPU核心数"></el-table-column>
-      <el-table-column prop="freeCPUCores" label="空闲CPU核心数"></el-table-column>
-      <el-table-column prop="freeMemory" label="空闲内存"></el-table-column>
-      <el-table-column prop="freeStorage" label="空闲存储"></el-table-column>
-      <el-table-column prop="owner" label="负责人"></el-table-column>
-      <el-table-column prop="armserverId" label="所属ARM服务器"></el-table-column>
+      <!-- data取自data()中的变量，:就是取自变量 -->
+      <el-table-column v-for="column in tableColumns" :prop="column.prop" :label="column.label"></el-table-column>
     </el-table>
   </div>
 </template>
+
 <script>
 import axios from 'axios'
 export default {
   data() {
-    //定义组件的各个默认值
     return {
       tableData: [],
-      bmc: {
-          id: '',
-          mac: '',
-          position: '',
-          location: '',
-          powerStatus: '',
-          sysStatus: '',
-          ip: '',
-          netmask: '',
-          gateway: '',
-          vlan: '',
-          CPU: '',
-          memory: '',
-          storage: '',
-          CPUCores: 0,
-          freeCPUCores: 0,
-          freeMemory: '',
-          freeStorage: '',
-          owner: '',
-          armserverId: ''
-      },
-      form:{}
+      bmc: {},
+      formItems: [
+        // 请求参数
+        { label: '区域', prop: 'location' },
+        { label: 'armserverId', prop: 'armserverId' },
+        { label: 'owner', prop: 'owner' },
+        { label: '电源状态', prop: 'powerStatus' },
+        { label: '页数', prop: 'pageNum' },
+        { label: '页大小', prop: 'pageSize' }
+      ],
+
+      tableColumns: [
+        // 要展示的响应参数
+        { label: 'ID', prop: 'id' },
+        { label: 'mac地址', prop: 'mac' },
+        { label: '位置', prop: 'position' },
+        { label: '区域', prop: 'location' },
+        { label: '电源状况', prop: 'powerStatus' },
+        { label: '系统状况', prop: 'sysStatus' },
+        { label: 'IP', prop: 'ip' },
+        { label: '子网掩码', prop: 'netmask' },
+        { label: '网关', prop: 'gateway' },
+        { label: 'VLAN', prop: 'vlan' },
+        { label: 'CPU型号', prop: 'CPU' },
+        { label: '内存', prop: 'memory' },
+        { label: '存储', prop: 'storage' },
+        { label: 'CPU核心数', prop: 'CPUCores' },
+        { label: '空闲CPU核心数', prop: 'freeCPUCores' },
+        { label: '空闲内存', prop: 'freeMemory' },
+        { label: '空闲存储', prop: 'freeStorage' },
+        { label: '负责人', prop: 'owner' },
+        { label: 'armserverId', prop: 'armserverId' }
+      ],
+      showResult: false
     }
   },
   methods: {
-    getbmc(){
-      // 使用 axios 发送 HTTP GET 请求，如果是跨域的，可以用nginx来替换免跨域，如下localhost:9999就是nginx本机的配置端口
-      axios.get('http://localhost:9999/testapi/bmcapi/v1/bmc/armcards', {
-          params: {
-              owner: this.bmc.owner,
-              armserverId: this.bmc.serverid,
-              pageNum: this.bmc.pagenum,
-              pageSize: this.bmc.pagesize,
-              powerStatus: this.bmc.powerstatus,
-              location: this.bmc.location,
-          },
-          headers: {//反向代理不能有header,认证要放到nginx反向代理里面
-            },
-          // secure: false
-          })
-      .then(response => {
-          // 请求成功，将响应结果 JSON 化
-          this.bmc.textarea = JSON.stringify(response.data)
-          
-          // 将 JSON 数据解析成多行数据
-          const data = response.data.armcards
-          const tableData = data.map(item => {
-              return {
-              id: item.id,
-              mac: item.mac,
-              position: item.position,
-              location: item.location,
-              powerStatus: item.powerStatus,
-              sysStatus: item.sysStatus,
-              ip: item.ip,
-              netmask: item.netmask,
-              gateway: item.gateway,
-              vlan: item.vlan,
-              CPU: item.CPU,
-              memory: item.memory,
-              storage: item.storage,
-              CPUCores: item.CPUCores,
-              freeCPUCores: item.freeCPUCores,
-              freeMemory: item.freeMemory,
-              freeStorage: item.freeStorage,
-              owner: item.owner,
-              armserverId: item.armserverId
-              }
-          })
-          this.tableData = tableData
-
-      })
-      .catch(error => {
-          console.log(error)
+    getbmc() {
+      let params = {}  //定义请求参数
+      for (let item of this.formItems) {
+        let propkey=item.prop
+        if (this.bmc[propkey]) {
+          params[propkey] = this.bmc[propkey]  //如果请求参数有值，就拼接到请求中
+        }
+      }
+      axios.get('http://localhost:9999/testapi/bmcapi/v1/bmc/armcards', { params }).then(res => {
+        this.bmc.textarea=JSON.stringify(res.data.armcards)
+        const tableData = res.data.armcards.map(item => {
+          const tableItem = {}
+          for (let column of this.tableColumns) { //按照设定的响应参数，将结果数据映射到表格中
+            tableItem[column.prop] = item[column.prop]
+          }
+          return tableItem
+        })
+        this.tableData = tableData
       })
     },
     onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
-      })
-    },
-    getbmc2(){
-      // 使用 axios 发送 HTTP GET 请求
-      axios.get('http://localhost:9999/bmcapi/v1/bmc/armcards', {
-        params: {
-              owner: '103079215138'
-          },
-          })
-      .then(response => {
-          // 请求成功，将响应结果 JSON 化
-          this.bmc.textarea = JSON.stringify(response.data)
-          console.log(response)
-      })
-      .catch(error => {
-          console.log(error)
-      })
-    },
+      this.bmc={}
+      this.tableData = []
+    }
   }
 }
 </script>
-<style scoped> 
+
+<style scoped>
+.app-container {
+  margin: 20px;
+}
 </style>
-  
-  
